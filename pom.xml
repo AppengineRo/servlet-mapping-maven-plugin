@@ -48,6 +48,11 @@
             <version>0.9.9-RC1</version>
         </dependency>
         <dependency>
+            <groupId>ro.appengine</groupId>
+            <artifactId>web-framework</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.1</version>
@@ -73,6 +78,11 @@
             <artifactId>maven-plugin-annotations</artifactId>
             <version>3.2</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
 
     </dependencies>
 
@@ -93,6 +103,7 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <phase>install</phase>
                     </execution>
                 </executions>
             </plugin>
