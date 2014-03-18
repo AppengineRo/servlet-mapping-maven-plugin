@@ -22,6 +22,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import ro.appenigne.web.framework.annotation.RequiredType;
 import ro.appenigne.web.framework.annotation.UrlPattern;
+import ro.appenigne.web.framework.servlet.AbstractIController;
 import ro.appenigne.web.framework.utils.AbstractUserType;
 
 import javax.servlet.http.HttpServlet;
@@ -65,7 +66,7 @@ public class WebXmlMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (StringUtils.isEmpty(extendedClass)) {
-            extendedClass = "ro.appenigne.web.framework.servlet.AbstractIController";
+            extendedClass = AbstractIController.class.getName();
         }
         if (StringUtils.isEmpty(destinations)) {
             destinations = resolveOutputWebXml();
