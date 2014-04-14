@@ -29,6 +29,7 @@
             <email>cosmin@atlasnet.ro</email>
         </developer>
     </developers>
+
     <scm>
         <url>https://github.com/bogdan-nourescu/servlet-mapping-maven-plugin.git</url>
         <connection>https://github.com/bogdan-nourescu/servlet-mapping-maven-plugin.git</connection>
