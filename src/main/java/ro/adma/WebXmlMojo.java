@@ -138,7 +138,7 @@ public class WebXmlMojo extends AbstractMojo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //TODO: if it doesn't exist create at end of file
         String firstPartWebXml = contentWebXml.substring(0, contentWebXml.indexOf(startMark) + startMark.length());
         String lastPartWebXml = contentWebXml.substring(contentWebXml.indexOf(endMark));
 
@@ -148,7 +148,7 @@ public class WebXmlMojo extends AbstractMojo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //TODO: if it doesn't exist create inside system-properties; If that doesn't exist, create it at the end of the file
         String firstPartAppengineWebXml = contentAppengineWebXml.substring(0, contentAppengineWebXml.indexOf(startMark) + startMark.length());
         String lastPartAppengineWebXml = contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(endMark));
 
@@ -224,8 +224,8 @@ public class WebXmlMojo extends AbstractMojo {
             //urlPatternCounter++;
         }
         try {
-            writeFile(fileNameWebXml, firstPartWebXml + strWebXml.toString() + lastPartWebXml);
-            writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + strAppengineWebXml.toString() + lastPartAppengineWebXml);
+            writeFile(fileNameWebXml, firstPartWebXml + strWebXml.toString() + "    " + lastPartWebXml);
+            writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + strAppengineWebXml.toString() + "        " + lastPartAppengineWebXml);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -245,7 +245,7 @@ public class WebXmlMojo extends AbstractMojo {
     private void addSystemProperty(String ls, StringBuilder str, String className, String... urlPatterns) {
         //example: <property name="url:/enrol/{clientName}/{clientHash}" value="true"/>
         for (String urlPattern : urlPatterns) {
-            str.append("<property name=\"url:");
+            str.append("        <property name=\"url:");
             str.append(urlPattern);
             str.append("\" value=\"");
             str.append(className);
@@ -274,7 +274,7 @@ public class WebXmlMojo extends AbstractMojo {
     }
 
     private void addServletMapping(String ls, StringBuilder str, String className, String servletName, String... urlPatterns) {
-        str.append("<servlet>");
+        str.append("    <servlet>");
         str.append("<servlet-name>");
         str.append(servletName);
         str.append("</servlet-name>");
@@ -300,7 +300,8 @@ public class WebXmlMojo extends AbstractMojo {
     private static String readFile(String file) throws IOException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(
-                        new FileInputStream(file), "UTF8"));
+                        new FileInputStream(file), "UTF8")
+        );
         String line;
         StringBuilder stringBuilder = new StringBuilder();
         String ls = System.getProperty("line.separator");
