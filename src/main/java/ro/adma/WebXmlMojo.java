@@ -184,7 +184,7 @@ public class WebXmlMojo extends AbstractMojo {
         }
         for (String className : resHttp) {
             String servletName = className.replaceAll("[.]", "_");
-            Collection<String> urlPatterns = annotationScanner.get(className + "|" + UrlPattern.class.getName());
+            LinkedHashSet<String> urlPatterns = new LinkedHashSet<>(annotationScanner.get(className + "|" + UrlPattern.class.getName()));
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 getLog().info("Servlet mapping skipped: " + className);
                 extendedClassesSkipped++;
