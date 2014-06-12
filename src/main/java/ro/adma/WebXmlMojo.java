@@ -37,7 +37,7 @@ public class WebXmlMojo extends AbstractMojo {
     @Parameter
     private String scanners;
 
-    private static final String DEFAULT_INCLUDE_EXCLUDE = "-java\\..*, -javax\\..*, -sun\\..*, -com\\.sun\\..*, -com\\.google\\..*, +javax\\.servlet\\.http\\..*";
+    private static final String DEFAULT_INCLUDE_EXCLUDE = "-java\\..*, -javax\\..*, -sun\\..*, -com\\.sun\\..*, +javax\\.servlet\\.http\\..*";
 
     @Parameter(defaultValue = DEFAULT_INCLUDE_EXCLUDE)
     private String includeExclude;
@@ -239,7 +239,7 @@ public class WebXmlMojo extends AbstractMojo {
         //"webapp/reflections.xml"
         //JavaCodeSerializer javaCodeSerializer = new JavaCodeSerializer();
         //javaCodeSerializer.save(reflections, destinations.trim() + "java/ro.adma.MyModelStore");
-
+        //reflections.save(destinations.trim()+"/reflections.xml");
     }
 
     private void addSystemProperty(String ls, StringBuilder str, String className, String... urlPatterns) {
