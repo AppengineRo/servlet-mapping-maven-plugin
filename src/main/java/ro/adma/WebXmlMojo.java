@@ -78,7 +78,6 @@ public class WebXmlMojo extends AbstractMojo {
             return;
         }
 
-        //
         ConfigurationBuilder config = new ConfigurationBuilder();
 
         config.setUrls(parseUrls());
@@ -121,6 +120,10 @@ public class WebXmlMojo extends AbstractMojo {
         Reflections reflections = new Reflections(config);
         final String startMark = "<!-- Generated servlet mapping -->";
         final String endMark = "<!-- End Generated servlet mapping -->";
+        final String webXmlInsertPoint = "</web-app>";
+        final String appengineWebXmlInsertPoint = "</system-properties>";
+        final String systemPropInsertPoint = "</appengine-web-app>";
+
         final String ls = System.getProperty("line.separator");
         Set<String> resources = reflections.getStore().getSubTypesOf(extendedClass);
         Set<String> resourcesHttp = reflections.getStore().getSubTypesOf(HttpServlet.class.getName());
@@ -138,9 +141,15 @@ public class WebXmlMojo extends AbstractMojo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //TODO: if it doesn't exist create at end of file
-        String firstPartWebXml = contentWebXml.substring(0, contentWebXml.indexOf(startMark) + startMark.length());
-        String lastPartWebXml = contentWebXml.substring(contentWebXml.indexOf(endMark));
+        String firstPartWebXml;
+        String lastPartWebXml;
+        if (!contentWebXml.contains(startMark)) {
+            firstPartWebXml = contentWebXml.substring(0, contentWebXml.indexOf(webXmlInsertPoint)) + ls + "    " + startMark;
+            lastPartWebXml = endMark + ls + contentWebXml.substring(contentWebXml.indexOf(webXmlInsertPoint));
+        } else {
+            firstPartWebXml = contentWebXml.substring(0, contentWebXml.indexOf(startMark) + startMark.length());
+            lastPartWebXml = contentWebXml.substring(contentWebXml.indexOf(endMark));
+        }
 
         String contentAppengineWebXml = "";
         try {
@@ -148,9 +157,23 @@ public class WebXmlMojo extends AbstractMojo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //TODO: if it doesn't exist create inside system-properties; If that doesn't exist, create it at the end of the file
-        String firstPartAppengineWebXml = contentAppengineWebXml.substring(0, contentAppengineWebXml.indexOf(startMark) + startMark.length());
-        String lastPartAppengineWebXml = contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(endMark));
+        String firstPartAppengineWebXml;
+        String lastPartAppengineWebXml;
+        if(!contentAppengineWebXml.contains(appengineWebXmlInsertPoint)){
+            firstPartAppengineWebXml =
+                    contentAppengineWebXml.substring(0, contentAppengineWebXml.indexOf(systemPropInsertPoint))
+                    + ls + "    " + "<system-properties>"
+                    + ls + "        " + startMark;
+            lastPartAppengineWebXml =
+                    endMark + ls + "    " + appengineWebXmlInsertPoint +
+                    ls +contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(systemPropInsertPoint));
+        } else if (!contentAppengineWebXml.contains(startMark)) {
+            firstPartAppengineWebXml = contentAppengineWebXml.substring(0, contentAppengineWebXml.indexOf(appengineWebXmlInsertPoint)) + ls + "        " + startMark;
+            lastPartAppengineWebXml = endMark + ls + "    " + contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(appengineWebXmlInsertPoint));
+        } else {
+            firstPartAppengineWebXml = contentAppengineWebXml.substring(0, contentAppengineWebXml.indexOf(startMark) + startMark.length());
+            lastPartAppengineWebXml = contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(endMark));
+        }
 
         StringBuilder strWebXml = new StringBuilder();
         strWebXml.append(ls);
@@ -160,9 +183,9 @@ public class WebXmlMojo extends AbstractMojo {
         int extendedClassesSkipped = 0;
         int securityConstraintCounter = 0;
 
-        List<String> res = new ArrayList<String>(resources);
+        List<String> res = new ArrayList<>(resources);
         Collections.sort(res);
-        List<String> resHttp = new ArrayList<String>(resourcesHttp);
+        List<String> resHttp = new ArrayList<>(resourcesHttp);
         Collections.sort(resHttp);
         for (String className : res) {
             Collection<String> urlPatterns = annotationScanner.get(className + "|" + UrlPattern.class.getName());
@@ -226,9 +249,7 @@ public class WebXmlMojo extends AbstractMojo {
         try {
             writeFile(fileNameWebXml, firstPartWebXml + strWebXml.toString() + "    " + lastPartWebXml);
             writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + strAppengineWebXml.toString() + "        " + lastPartAppengineWebXml);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         getLog().info("Number of servlet mapping generated: " + urlPatternCounter);
