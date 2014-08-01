@@ -38,7 +38,9 @@ public class IncrementVersionMojo extends AbstractMojo {
         if (StringUtils.isEmpty(destinations)) {
             destinations = resolveOutputWebXml();
         }
-
+        if (StringUtils.isEmpty(suffix)) {
+            suffix = "";
+        }
 
         final String versionStartMark = "<version>";
         final String versionEndMark = "</version>";
