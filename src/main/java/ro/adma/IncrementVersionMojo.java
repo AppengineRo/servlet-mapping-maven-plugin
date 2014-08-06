@@ -24,6 +24,9 @@ public class IncrementVersionMojo extends AbstractMojo {
     @Parameter(defaultValue = "")
     private String suffix;
 
+    @Parameter(defaultValue = "")
+    private String prefix;
+
     @Parameter(defaultValue = "https://{0}.appspot.com/getMajorVersion/{1}/")
     private String url;
 
@@ -40,6 +43,10 @@ public class IncrementVersionMojo extends AbstractMojo {
         }
         if (StringUtils.isEmpty(suffix)) {
             suffix = "";
+        }
+
+        if (StringUtils.isEmpty(prefix)) {
+            prefix = "";
         }
 
         final String versionStartMark = "<version>";
@@ -92,13 +99,16 @@ public class IncrementVersionMojo extends AbstractMojo {
                 URLConnection urlConnection = uri.openConnection();
                 urlConnection.connect();
                 InputStream inputStream = urlConnection.getInputStream();
-                String defaultVersionNumber = readInput(inputStream).trim().replaceAll("[^0-9]+","");
+                String defaultVersionNumber = readInput(inputStream).trim().replaceAll("[^0-9]+", "");
                 int versionNumber = Integer.parseInt(defaultVersionNumber);
                 versionNumber++;
-                if(!suffix.isEmpty()) {
-                    suffix = suffix.toLowerCase().replaceAll("[^a-z]+", "")+"-";
+                if (!prefix.isEmpty()) {
+                    prefix = prefix.toLowerCase().replaceAll("[^a-z]+", "") + "-";
                 }
-                String versionNumberString = suffix+versionNumber;
+                if (!suffix.isEmpty()) {
+                    suffix = "-" + suffix.toLowerCase().replaceAll("[^a-z]+", "");
+                }
+                String versionNumberString = prefix + versionNumber + suffix;
                 getLog().info("Version number changed from: " + defaultVersionNumber + " to: " + versionNumberString);
                 writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + versionNumberString + lastPartAppengineWebXml);
             } catch (IOException e) {
