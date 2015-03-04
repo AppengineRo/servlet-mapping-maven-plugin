@@ -10,7 +10,7 @@
 
     <groupId>ro.appengine</groupId>
     <artifactId>web-generator-maven-plugin</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <packaging>maven-plugin</packaging>
     <name>Web Generator Maven Plugin</name>
 
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>ro.appengine</groupId>
             <artifactId>web-framework</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
