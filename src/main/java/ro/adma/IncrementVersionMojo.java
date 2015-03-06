@@ -10,6 +10,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
@@ -94,29 +95,41 @@ public class IncrementVersionMojo extends AbstractMojo {
 
 
             String fullLink = MessageFormat.format(url, appId, module);
+            String defaultVersionNumber = "none";
+            int versionNumber = 1;
             try {
                 URL uri = new URL(fullLink);
-                URLConnection urlConnection = uri.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) uri.openConnection();
+
                 urlConnection.connect();
-                InputStream inputStream = urlConnection.getInputStream();
-                String defaultVersionNumber = readInput(inputStream).trim().replaceAll("[^0-9]+", "");
-                int versionNumber = Integer.parseInt(defaultVersionNumber);
-                versionNumber++;
-                if (!prefix.isEmpty()) {
-                    prefix = prefix.toLowerCase().replaceAll("[^a-z]+", "") + "-";
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    InputStream inputStream = urlConnection.getInputStream();
+                    defaultVersionNumber = readInput(inputStream).trim().replaceAll("[^0-9]+", "");
+                    versionNumber = Integer.parseInt(defaultVersionNumber);
+                    versionNumber++;
                 }
-                if (!suffix.isEmpty()) {
-                    suffix = "-" + suffix.toLowerCase().replaceAll("[^a-z]+", "");
-                }
-                String versionNumberString = prefix + versionNumber + suffix;
-                getLog().info("Version number changed from: " + defaultVersionNumber + " to: " + versionNumberString);
-                writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + versionNumberString + lastPartAppengineWebXml);
             } catch (IOException e) {
                 getLog().warn(e);
                 throw new MojoFailureException(e.getMessage());
             } catch (NumberFormatException e) {
                 throw new MojoFailureException("Version number cannot be calculated. Do you have a servlet that responds with the default module version? We tested on and couldn't parseInt it: " + fullLink);
             }
+            if (!prefix.isEmpty()) {
+                prefix = prefix.toLowerCase().replaceAll("[^a-z]+", "") + "-";
+            }
+            if (!suffix.isEmpty()) {
+                suffix = "-" + suffix.toLowerCase().replaceAll("[^a-z]+", "");
+            }
+            String versionNumberString = prefix + versionNumber + suffix;
+            getLog().info("Version number changed from: " + defaultVersionNumber + " to: " + versionNumberString);
+            try {
+                writeFile(fileNameAppengineWebXml, firstPartAppengineWebXml + versionNumberString + lastPartAppengineWebXml);
+            } catch (FileNotFoundException | UnsupportedEncodingException e) {
+                getLog().warn(e);
+                throw new MojoFailureException(e.getMessage());
+            }
+
         } else {
             String oldVersion = contentAppengineWebXml.substring(contentAppengineWebXml.indexOf(versionStartMark) + versionStartMark.length(), contentAppengineWebXml.indexOf(versionEndMark));
             getLog().warn("Version specified in appengine-web.xml. Keeping that version: " + oldVersion);
