@@ -28,7 +28,7 @@ public class IncrementVersionMojo extends AbstractMojo {
     @Parameter(defaultValue = "")
     private String prefix;
 
-    @Parameter(defaultValue = "https://{0}.appspot.com/GetMajorVersion?module={1}/")
+    @Parameter(defaultValue = "https://{0}.appspot.com/GetMajorVersion?module={1}")
     private String url;
 
     @Parameter(property = "project", required = true, readonly = true)
