@@ -31,7 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-@Mojo(name = "web_mapping", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+@Mojo(name = "web_mapping", defaultPhase = LifecyclePhase.PACKAGE)
 public class WebXmlMojo extends AbstractMojo {
 
     @Parameter
@@ -133,8 +133,8 @@ public class WebXmlMojo extends AbstractMojo {
         getLog().info("------------------------------------------------------------------------");
         getLog().info("Number of classes that extend " + extendedClass + ": " + resources.size());
 
-        String fileNameWebXml = destinations + "webapp/WEB-INF/web.xml";
-        String fileNameAppengineWebXml = destinations + "webapp/WEB-INF/appengine-web.xml";
+        String fileNameWebXml = destinations + "WEB-INF/web.xml";
+        String fileNameAppengineWebXml = destinations + "WEB-INF/appengine-web.xml";
         String contentWebXml = "";
         try {
             contentWebXml = readFile(fileNameWebXml);
@@ -453,7 +453,6 @@ public class WebXmlMojo extends AbstractMojo {
 
     private String resolveOutputWebXml() {
         String fs = System.getProperty("file.separator");
-        //String path = mavenProject.getBuild().getDirectory() + fs + mavenProject.getBuild().getFinalName() + fs;
-        return mavenProject.getBasedir().getAbsolutePath() + "/src/main/";
+        return resolveOutputDirectory() + fs;
     }
 }
