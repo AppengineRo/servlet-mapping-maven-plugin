@@ -12,7 +12,6 @@ import org.codehaus.plexus.util.StringUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.MessageFormat;
 
 @Mojo(name = "increment_version", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
@@ -109,11 +108,11 @@ public class IncrementVersionMojo extends AbstractMojo {
                     versionNumber = Integer.parseInt(defaultVersionNumber);
                     versionNumber++;
                 }
-            } catch (IOException e) {
-                getLog().warn(e);
-                throw new MojoFailureException(e.getMessage());
             } catch (NumberFormatException e) {
                 throw new MojoFailureException("Version number cannot be calculated. Do you have a servlet that responds with the default module version? We tested on and couldn't parseInt it: " + fullLink);
+            } catch (Exception e) {
+                getLog().warn(e);
+                throw new MojoFailureException(e.getMessage());
             }
             if (!prefix.isEmpty()) {
                 prefix = prefix.toLowerCase().replaceAll("[^a-z]+", "") + "-";
