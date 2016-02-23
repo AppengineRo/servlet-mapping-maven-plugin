@@ -49,6 +49,9 @@ public class WebXmlMojo extends AbstractMojo {
     private String extendedClass;
 
     @Parameter
+    private String annotationClass;
+
+    @Parameter
     private String serializer;
 
     @Parameter(defaultValue = "false")
@@ -68,6 +71,10 @@ public class WebXmlMojo extends AbstractMojo {
         if (StringUtils.isEmpty(extendedClass)) {
             extendedClass = AbstractIController.class.getName();
         }
+        if (StringUtils.isEmpty(annotationClass)) {
+            annotationClass = UrlPattern.class.getName();
+        }
+
         if (StringUtils.isEmpty(destinations)) {
             destinations = resolveOutputWebXml();
         }
@@ -188,7 +195,7 @@ public class WebXmlMojo extends AbstractMojo {
         List<String> resHttp = new ArrayList<>(resourcesHttp);
         Collections.sort(resHttp);
         for (String className : res) {
-            Collection<String> urlPatterns = annotationScanner.get(className + "|" + UrlPattern.class.getName());
+            Collection<String> urlPatterns = annotationScanner.get(className + "|" + annotationClass);
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 //getLog().info("Servlet mapping skipped: " + className);
                 //extendedClassesSkipped++;
@@ -207,7 +214,7 @@ public class WebXmlMojo extends AbstractMojo {
         }
         for (String className : resHttp) {
             String servletName = className.replaceAll("[.]", "_");
-            LinkedHashSet<String> urlPatterns = new LinkedHashSet<>(annotationScanner.get(className + "|" + UrlPattern.class.getName()));
+            LinkedHashSet<String> urlPatterns = new LinkedHashSet<>(annotationScanner.get(className + "|" + annotationClass));
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 getLog().info("Servlet mapping skipped: " + className);
                 extendedClassesSkipped++;
@@ -226,7 +233,7 @@ public class WebXmlMojo extends AbstractMojo {
         }
         for (String className : res) {
             String servletName = className.replaceAll("[.]", "_");
-            Collection<String> urlPatterns = annotationScanner.get(className + "|" + UrlPattern.class.getName());
+            Collection<String> urlPatterns = annotationScanner.get(className + "|" + annotationClass);
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 continue;
             }
