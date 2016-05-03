@@ -20,10 +20,6 @@ import org.reflections.serializers.Serializer;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import ro.appenigne.web.framework.annotation.RequiredType;
-import ro.appenigne.web.framework.annotation.UrlPattern;
-import ro.appenigne.web.framework.servlet.AbstractIController;
-import ro.appenigne.web.framework.utils.AbstractUserType;
 
 import javax.servlet.http.HttpServlet;
 import java.io.*;
@@ -52,6 +48,15 @@ public class WebXmlMojo extends AbstractMojo {
     private String annotationClass;
 
     @Parameter
+    private String requiredType;
+
+    @Parameter
+    private String adminType;
+
+    @Parameter
+    private HashSet excludeClasses;
+
+    @Parameter
     private String serializer;
 
     @Parameter(defaultValue = "false")
@@ -69,10 +74,16 @@ public class WebXmlMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (StringUtils.isEmpty(extendedClass)) {
-            extendedClass = AbstractIController.class.getName();
+            extendedClass = "ro.appenigne.web.framework.servlet.AbstractIController";
         }
         if (StringUtils.isEmpty(annotationClass)) {
-            annotationClass = UrlPattern.class.getName();
+            annotationClass = "ro.appenigne.web.framework.annotation.UrlPattern";
+        }
+        if (StringUtils.isEmpty(requiredType)) {
+            requiredType = "ro.appenigne.web.framework.annotation.RequiredType";
+        }
+        if (StringUtils.isEmpty(adminType)) {
+            adminType = "SuperAdministrator";
         }
 
         if (StringUtils.isEmpty(destinations)) {
@@ -195,7 +206,10 @@ public class WebXmlMojo extends AbstractMojo {
         List<String> resHttp = new ArrayList<>(resourcesHttp);
         Collections.sort(resHttp);
         for (String className : res) {
-            Collection<String> urlPatterns = annotationScanner.get(className + "|" + annotationClass);
+            if (this.excludeClasses != null && this.excludeClasses.contains(className)) {
+                continue;
+            }
+            HashSet<String> urlPatterns = new HashSet<>(annotationScanner.get(className + "|" + annotationClass));
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 //getLog().info("Servlet mapping skipped: " + className);
                 //extendedClassesSkipped++;
@@ -213,8 +227,12 @@ public class WebXmlMojo extends AbstractMojo {
             }
         }
         for (String className : resHttp) {
+            if (this.excludeClasses != null && this.excludeClasses.contains(className)) {
+                continue;
+            }
             String servletName = className.replaceAll("[.]", "_");
             LinkedHashSet<String> urlPatterns = new LinkedHashSet<>(annotationScanner.get(className + "|" + annotationClass));
+
             if (urlPatterns.size() == 0 && !className.contains("controller")) {
                 getLog().info("Servlet mapping skipped: " + className);
                 extendedClassesSkipped++;
@@ -242,9 +260,9 @@ public class WebXmlMojo extends AbstractMojo {
                 urlPattern = "/do/" + urlPattern.substring(urlPattern.indexOf("controller/") + "controller/".length());
                 urlPatterns.add(urlPattern);
             }
-            Collection<String> requiredType = annotationScanner.get(className + "|" + RequiredType.class.getName());
-            if (requiredType.size() == 1) {
-                if (requiredType.iterator().next().equals(AbstractUserType.SuperAdministrator)) {
+            Collection<String> requiredTypeC = annotationScanner.get(className + "|" + requiredType);
+            if (requiredTypeC.size() == 1) {
+                if (requiredTypeC.iterator().next().equals("SuperAdministrator")) {
                     //create security constraint with admin
                     //addSecurityMapping(ls, strWebXml, servletName, urlPatterns.toArray(new String[urlPatterns.size()]));
                     securityConstraintCounter += urlPatterns.size();

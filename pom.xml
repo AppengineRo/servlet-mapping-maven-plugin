@@ -10,7 +10,7 @@
 
     <groupId>ro.appengine</groupId>
     <artifactId>web-generator-maven-plugin</artifactId>
-    <version>0.6</version>
+    <version>1.0.1</version>
     <packaging>maven-plugin</packaging>
     <name>Web Generator Maven Plugin</name>
 
@@ -47,11 +47,6 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.9-RC1</version>
-        </dependency>
-        <dependency>
-            <groupId>ro.appengine</groupId>
-            <artifactId>web-framework</artifactId>
-            <version>0.5</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -96,7 +91,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1.2</version>
                 <executions>
@@ -107,7 +102,7 @@
                         <phase>install</phase>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <!--<plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.8</version>
@@ -160,5 +155,25 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>ar.com.synergian</groupId>
+                <artifactId>wagon-git</artifactId>
+                <version>0.2.5</version>
+            </extension>
+        </extensions>
     </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>synergian-repo</id>
+            <url>https://raw.github.com/synergian/wagon-git/releases</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <distributionManagement>
+        <repository>
+            <id>cbn-mvn</id>
+            <name>cbn-it</name>
+            <url>git:releases://git@bitbucket.org:cbn-it/mvn-repo.git</url>
+        </repository>
+    </distributionManagement>
 </project>
