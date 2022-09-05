@@ -38,7 +38,6 @@ public class IncrementVersionMojo extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-
         if (StringUtils.isEmpty(destinations)) {
             destinations = resolveOutputWebXml();
         }
@@ -170,6 +169,7 @@ public class IncrementVersionMojo extends AbstractMojo {
         String path = mavenProject.getBuild().getDirectory() + fs + mavenProject.getBuild().getFinalName() + fs;
         //getLog().warn(path);
         //getLog().warn(mavenProject.getBasedir().getAbsolutePath() + "/src/main/webapp/");
+
         return path;
     }
 }
